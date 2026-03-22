@@ -11,9 +11,10 @@ spring:
     baseline-version: 2
   datasource:
     # Cổng dùng POSTGRES_PORT (mặc định 5432). Tránh DB_PORT=3306 sót từ blueprint MySQL trên Render.
-    url: jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_PORT:5432}/${DB_NAME:deutsch_db}?sslmode=${PG_SSLMODE:prefer}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:}
+    # url: jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_PORT:5432}/${DB_NAME:deutsch_db}?sslmode=${PG_SSLMODE:prefer}
+    # username: ${DB_USERNAME:postgres}
+    # password: ${DB_PASSWORD:}
+    url : postgresql://apptd:i0DNOQM6zlmTq8bE2EInCv4VMWnbQVUY@dpg-d6vsua7fte5s73e31ong-a/deutsch_db
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
