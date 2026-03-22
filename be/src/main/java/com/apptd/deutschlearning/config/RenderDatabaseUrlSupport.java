@@ -138,21 +138,37 @@ public final class RenderDatabaseUrlSupport {
     }
 
     /**
-     * Render Postgres bắt buộc TLS; {@code sslmode=prefer} dễ bị server đóng socket (EOF) khi auth.
-     * Ưu tiên {@code PG_SSLMODE}; nếu không set: trên Render ({@code RENDER=true}) hoặc host kiểu Render → {@code require}.
+     * {@code PG_SSLMODE} luôn được tôn trọng nếu set.
+     * <p>
+     * Internal URL trên Render ({@code dpg-…} qua private network): không dùng TLS như external — {@code require}
+     * thường gây EOF lúc auth. External host {@code *.render.com}: cần {@code require}.
      */
     static String resolveSslMode(Function<String, String> get, String hostHint) {
         String explicit = get.apply("PG_SSLMODE");
         if (explicit != null && !explicit.isBlank()) {
             return explicit.trim();
         }
-        boolean onRender = "true".equalsIgnoreCase(firstNonBlank(get.apply("RENDER"), ""));
         String h = hostHint != null ? hostHint.trim() : "";
-        boolean renderDbHost = h.startsWith("dpg-") || h.contains(".render.com");
-        if (onRender || renderDbHost) {
+        if (isRenderInternalPostgresHost(h)) {
+            return "disable";
+        }
+        if (h.contains(".render.com")) {
             return "require";
         }
         return "prefer";
+    }
+
+    /** Host cụt internal từ DATABASE_URL blueprint Render (private network). */
+    private static boolean isRenderInternalPostgresHost(String h) {
+        return h.startsWith("dpg-") && !h.contains(".");
+    }
+
+    private static boolean isRunningOnRender(Function<String, String> get) {
+        if ("true".equalsIgnoreCase(firstNonBlank(get.apply("RENDER"), ""))) {
+            return true;
+        }
+        String sid = get.apply("RENDER_SERVICE_ID");
+        return sid != null && !sid.isBlank();
     }
 
     /** Lấy host từ {@code jdbc:postgresql://host:port/db} (đủ cho gợi ý SSL; không cần parse IPv6 đầy đủ). */
@@ -181,8 +197,8 @@ public final class RenderDatabaseUrlSupport {
     }
 
     /**
-     * Render hay đưa host cụt {@code dpg-xxx-a} trong connectionString — trong Docker JVM thường không resolve (UnknownHostException).
-     * Thêm FQDN qua {@code RENDER_POSTGRES_HOST_SUFFIX} (vd. {@code singapore-postgres.render.com}), khớp region của Postgres trên dashboard.
+     * Host cụt {@code dpg-…}: trên Render, DNS private network resolve được — giữ nguyên (không ép FQDN external).
+     * Ngoài Render (Docker laptop, CI): cần {@code RENDER_POSTGRES_HOST_SUFFIX} nếu host không resolve.
      */
     private static String normalizeRenderPostgresHost(String host, Function<String, String> get) {
         if (host == null || host.isBlank()) {
@@ -193,6 +209,10 @@ public final class RenderDatabaseUrlSupport {
             return host;
         }
         if (!host.startsWith("dpg-")) {
+            return host;
+        }
+        if (isRunningOnRender(get)) {
+            log.info("Giữ Postgres internal host (Render private network): {}", host);
             return host;
         }
         String suffix = firstNonBlank(get.apply("RENDER_POSTGRES_HOST_SUFFIX"), get.apply("PG_DNS_SUFFIX"));

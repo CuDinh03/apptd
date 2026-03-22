@@ -38,8 +38,8 @@ services:
         fromDatabase:
           name: apptd-postgres
           property: connectionString
-      - key: PG_SSLMODE
-        value: require
+      # Không đặt PG_SSLMODE=require: Internal DATABASE_URL dùng host dpg-… (private network, không TLS như external).
+      # External / máy local: đặt PG_SSLMODE=require trên dashboard nếu cần.
       - key: RENDER_POSTGRES_HOST_SUFFIX
         value: singapore-postgres.render.com
       - key: JWT_SECRET
