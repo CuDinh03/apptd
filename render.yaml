@@ -2,6 +2,7 @@
 # PostgreSQL free (cùng workspace) được nối qua DATABASE_URL; backend tự chuyển sang JDBC.
 # Nếu tạo BE tay (không Blueprint): vào Web Service → Environment → Add → From database → chọn Postgres
 # để có DATABASE_URL; hoặc dán Internal Database URL vào biến DATABASE_URL. Thiếu URL → app nối localhost:5432 và lỗi.
+# connectionString đôi khi chỉ có host cụt dpg-…-a — BE cần RENDER_POSTGRES_HOST_SUFFIX = region-postgres.render.com (khớp region DB).
 # Trên service BE: xóa DB_PORT=3306 (MySQL cũ) nếu còn.
 #
 # Sau khi backend có URL (vd https://apptd-be.onrender.com), vào service FE sửa:
@@ -39,6 +40,8 @@ services:
           property: connectionString
       - key: PG_SSLMODE
         value: require
+      - key: RENDER_POSTGRES_HOST_SUFFIX
+        value: singapore-postgres.render.com
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ALLOWED_ORIGIN_PATTERNS

@@ -102,14 +102,15 @@ public final class RenderDatabaseUrlSupport {
             log.warn("Không parse được DATABASE_URL.");
             return null;
         }
+        String host = normalizeRenderPostgresHost(p.host, get);
         String sslMode = firstNonBlank(get.apply("PG_SSLMODE"), "prefer");
-        String jdbcBase = String.format("jdbc:postgresql://%s:%d/%s", p.host, p.port, p.dbName);
+        String jdbcBase = String.format("jdbc:postgresql://%s:%d/%s", host, p.port, p.dbName);
         String jdbcUrl = mergeQuery(jdbcBase, queryPart, sslMode);
         return new DatasourceConfig(jdbcUrl, p.user, p.password);
     }
 
     private static DatasourceConfig tryLibpq(Function<String, String> get) {
-        String host = get.apply("PGHOST");
+        String host = normalizeRenderPostgresHost(get.apply("PGHOST"), get);
         if (host == null || host.isBlank()) {
             return null;
         }
@@ -134,6 +135,35 @@ public final class RenderDatabaseUrlSupport {
         String sslMode = firstNonBlank(get.apply("PG_SSLMODE"), "prefer");
         String jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?sslmode=%s", host, port, db, sslMode);
         return new DatasourceConfig(jdbcUrl, user, pass);
+    }
+
+    /**
+     * Render hay đưa host cụt {@code dpg-xxx-a} trong connectionString — trong Docker JVM thường không resolve (UnknownHostException).
+     * Thêm FQDN qua {@code RENDER_POSTGRES_HOST_SUFFIX} (vd. {@code singapore-postgres.render.com}), khớp region của Postgres trên dashboard.
+     */
+    private static String normalizeRenderPostgresHost(String host, Function<String, String> get) {
+        if (host == null || host.isBlank()) {
+            return host;
+        }
+        host = host.trim();
+        if (host.contains(".")) {
+            return host;
+        }
+        if (!host.startsWith("dpg-")) {
+            return host;
+        }
+        String suffix = firstNonBlank(get.apply("RENDER_POSTGRES_HOST_SUFFIX"), get.apply("PG_DNS_SUFFIX"));
+        if (suffix == null || suffix.isBlank()) {
+            log.warn(
+                    "Postgres host '{}' không có domain — dễ UnknownHostException trong Docker. "
+                            + "Đặt RENDER_POSTGRES_HOST_SUFFIX=region-postgres.render.com (theo region DB trên Render).",
+                    host);
+            return host;
+        }
+        String s = suffix.startsWith(".") ? suffix.substring(1) : suffix;
+        String fqdn = host + "." + s;
+        log.info("Chuẩn hóa Postgres host: {} → {}", host, fqdn);
+        return fqdn;
     }
 
     private static String appendSslMode(String jdbcUrl, String sslMode) {
