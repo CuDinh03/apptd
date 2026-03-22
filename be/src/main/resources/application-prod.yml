@@ -3,6 +3,9 @@ spring:
   config:
     activate:
       on-profile: prod
+  datasource:
+    # Managed Postgres (Render, v.v.) thường bắt TLS; prefer dễ gây lỗi kết nối nếu không có DATABASE_URL map.
+    url: jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_PORT:5432}/${DB_NAME:deutsch_db}?sslmode=${PG_SSLMODE:require}
   jpa:
     hibernate:
       ddl-auto: validate

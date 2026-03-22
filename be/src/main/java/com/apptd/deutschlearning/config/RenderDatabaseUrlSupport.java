@@ -72,7 +72,7 @@ public final class RenderDatabaseUrlSupport {
         if (jdbc == null || jdbc.isBlank() || !jdbc.startsWith("jdbc:postgresql:")) {
             return null;
         }
-        String sslMode = firstNonBlank(get.apply("PG_SSLMODE"), "prefer");
+        String sslMode = resolveSslMode(get, extractJdbcHost(jdbc));
         String url = jdbc.contains("sslmode=") ? jdbc : appendSslMode(jdbc, sslMode);
         String user = get.apply("SPRING_DATASOURCE_USERNAME");
         String pass = get.apply("SPRING_DATASOURCE_PASSWORD");
@@ -103,7 +103,7 @@ public final class RenderDatabaseUrlSupport {
             return null;
         }
         String host = normalizeRenderPostgresHost(p.host, get);
-        String sslMode = firstNonBlank(get.apply("PG_SSLMODE"), "prefer");
+        String sslMode = resolveSslMode(get, host);
         String jdbcBase = String.format("jdbc:postgresql://%s:%d/%s", host, p.port, p.dbName);
         String jdbcUrl = mergeQuery(jdbcBase, queryPart, sslMode);
         return new DatasourceConfig(jdbcUrl, p.user, p.password);
@@ -132,9 +132,52 @@ public final class RenderDatabaseUrlSupport {
                 // 5432
             }
         }
-        String sslMode = firstNonBlank(get.apply("PG_SSLMODE"), "prefer");
+        String sslMode = resolveSslMode(get, host);
         String jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?sslmode=%s", host, port, db, sslMode);
         return new DatasourceConfig(jdbcUrl, user, pass);
+    }
+
+    /**
+     * Render Postgres bắt buộc TLS; {@code sslmode=prefer} dễ bị server đóng socket (EOF) khi auth.
+     * Ưu tiên {@code PG_SSLMODE}; nếu không set: trên Render ({@code RENDER=true}) hoặc host kiểu Render → {@code require}.
+     */
+    static String resolveSslMode(Function<String, String> get, String hostHint) {
+        String explicit = get.apply("PG_SSLMODE");
+        if (explicit != null && !explicit.isBlank()) {
+            return explicit.trim();
+        }
+        boolean onRender = "true".equalsIgnoreCase(firstNonBlank(get.apply("RENDER"), ""));
+        String h = hostHint != null ? hostHint.trim() : "";
+        boolean renderDbHost = h.startsWith("dpg-") || h.contains(".render.com");
+        if (onRender || renderDbHost) {
+            return "require";
+        }
+        return "prefer";
+    }
+
+    /** Lấy host từ {@code jdbc:postgresql://host:port/db} (đủ cho gợi ý SSL; không cần parse IPv6 đầy đủ). */
+    private static String extractJdbcHost(String jdbcUrl) {
+        try {
+            String rest = jdbcUrl.substring("jdbc:postgresql://".length());
+            int slash = rest.indexOf('/');
+            if (slash > 0) {
+                rest = rest.substring(0, slash);
+            }
+            if (rest.startsWith("[")) {
+                int br = rest.indexOf(']');
+                return br > 0 ? rest.substring(1, br) : "";
+            }
+            int colon = rest.lastIndexOf(':');
+            if (colon > 0) {
+                String maybePort = rest.substring(colon + 1);
+                if (maybePort.chars().allMatch(Character::isDigit)) {
+                    return rest.substring(0, colon);
+                }
+            }
+            return rest;
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     /**

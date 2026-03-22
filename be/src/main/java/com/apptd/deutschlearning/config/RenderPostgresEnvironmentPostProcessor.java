@@ -10,7 +10,10 @@ import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Bổ sung map env → datasource khi context không đi qua {@code main} (test). Trên Render, {@link RenderDatabaseUrlSupport#applySystemPropertiesFromOSEnv()} trong main là lớp bảo vệ chính.
+ * Map env → datasource. Phải chạy <em>sau</em> {@code ConfigDataEnvironmentPostProcessor} (ORDER = HIGHEST + 10):
+ * nếu chạy trước rồi {@code addFirst}, ConfigData cũng {@code addFirst} sau đó và {@code application.yml}
+ * sẽ nằm trên cùng — {@code spring.datasource.url} mặc định (localhost, sslmode=prefer) ghi đè JDBC từ {@code DATABASE_URL},
+ * Flyway/Hikari nối sai host và lỗi SSL (vd. EOF khi auth trên Render).
  */
 public class RenderPostgresEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
@@ -34,6 +37,6 @@ public class RenderPostgresEnvironmentPostProcessor implements EnvironmentPostPr
 
     @Override
     public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE;
+        return Ordered.LOWEST_PRECEDENCE;
     }
 }
