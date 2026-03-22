@@ -1,0 +1,21 @@
+# Xem / chỉnh dữ liệu Postgres qua trình duyệt: http://localhost:8081
+#
+# Đăng nhập Adminer: Hệ thống = PostgreSQL.
+#
+# 1) Postgres trên máy (Homebrew, port 5432, giống be/.env.local):
+#    Máy chủ: host.docker.internal
+#    Tên DB / User / Mật khẩu: copy từ be/.env.local
+#
+# 2) Linux (Docker Engine): nếu host.docker.internal không resolve, thay bằng IP LAN của máy
+#    hoặc giữ extra_hosts bên dưới (Docker 20.10+).
+#
+# 3) Database trên Render: dùng External host từ Dashboard Postgres (…postgres.render.com),
+#    user/password/dbname từ Connect; bật SSL nếu giao diện có tùy chọn.
+services:
+  adminer:
+    image: adminer:4-standalone
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

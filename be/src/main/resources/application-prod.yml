@@ -16,4 +16,4 @@ app:
   security:
     enforce-strong-jwt-secret: true
   cors:
-    allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:https://your-frontend.example}
+    allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:https://apptd-frontend.onrender.com}

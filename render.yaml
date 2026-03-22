@@ -6,9 +6,8 @@
 # bắt buộc RENDER_POSTGRES_HOST_SUFFIX = region-postgres.render.com (khớp region DB).
 # Trên service BE: xóa DB_PORT (MySQL cũ) nếu còn — app dùng POSTGRES_PORT / URL, DB_PORT không đọc.
 #
-# Sau khi backend có URL (vd https://apptd-be.onrender.com), vào service FE sửa:
-#   NEXT_PUBLIC_API_URL = https://apptd-be.onrender.com/api/v1
-# Và trên BE sửa CORS_ALLOWED_ORIGIN_PATTERNS = URL frontend Render.
+# Production: BE https://apptd-backend.onrender.com — FE https://apptd-frontend.onrender.com
+# (NEXT_PUBLIC_API_URL + CORS đã set trong envVars bên dưới.)
 
 # databases:
   #- name: apptd-postgres
@@ -46,7 +45,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ALLOWED_ORIGIN_PATTERNS
-        sync: false
+        value: https://apptd-frontend.onrender.com
 
   - type: web
     name: apptd-frontend
@@ -60,4 +59,4 @@ services:
       - key: NODE_VERSION
         value: "20.18.0"
       - key: NEXT_PUBLIC_API_URL
-        sync: false
+        value: https://apptd-backend.onrender.com/api/v1
