@@ -10,12 +10,12 @@
 #   NEXT_PUBLIC_API_URL = https://apptd-be.onrender.com/api/v1
 # Và trên BE sửa CORS_ALLOWED_ORIGIN_PATTERNS = URL frontend Render.
 
-databases:
-  - name: apptd-postgres
-    databaseName: deutsch_db
-    user: apptd
-    plan: free
-    region: singapore
+# databases:
+  #- name: apptd-postgres
+    #databaseName: deutsch_db
+    #user: apptd
+    #plan: free
+    #region: singapore
 
 services:
   - type: web
