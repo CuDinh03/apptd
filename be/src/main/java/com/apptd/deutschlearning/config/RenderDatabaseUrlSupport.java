@@ -72,7 +72,7 @@ public final class RenderDatabaseUrlSupport {
         if (jdbc == null || jdbc.isBlank() || !jdbc.startsWith("jdbc:postgresql:")) {
             return null;
         }
-        String sslMode = resolveSslMode(get, extractJdbcHost(jdbc));
+        String sslMode = resolveSslMode(get, extractJdbcHost(jdbc), false);
         String url = jdbc.contains("sslmode=") ? jdbc : appendSslMode(jdbc, sslMode);
         String user = get.apply("SPRING_DATASOURCE_USERNAME");
         String pass = get.apply("SPRING_DATASOURCE_PASSWORD");
@@ -102,15 +102,21 @@ public final class RenderDatabaseUrlSupport {
             log.warn("Không parse được DATABASE_URL.");
             return null;
         }
+        boolean internalShortHost = isRenderInternalPostgresHost(p.host);
         String host = normalizeRenderPostgresHost(p.host, get);
-        String sslMode = resolveSslMode(get, host);
+        boolean expandedInternalToFqdn = internalShortHost && host.contains(".render.com");
+        if (expandedInternalToFqdn && !queryPart.isEmpty()) {
+            queryPart = rebuildQueryWithoutSslMode(queryPart);
+        }
+        String sslMode = resolveSslMode(get, host, expandedInternalToFqdn);
         String jdbcBase = String.format("jdbc:postgresql://%s:%d/%s", host, p.port, p.dbName);
         String jdbcUrl = mergeQuery(jdbcBase, queryPart, sslMode);
         return new DatasourceConfig(jdbcUrl, p.user, p.password);
     }
 
     private static DatasourceConfig tryLibpq(Function<String, String> get) {
-        String host = normalizeRenderPostgresHost(get.apply("PGHOST"), get);
+        String rawPgHost = get.apply("PGHOST");
+        String host = normalizeRenderPostgresHost(rawPgHost, get);
         if (host == null || host.isBlank()) {
             return null;
         }
@@ -132,30 +138,74 @@ public final class RenderDatabaseUrlSupport {
                 // 5432
             }
         }
-        String sslMode = resolveSslMode(get, host);
+        boolean expandedInternalToFqdn =
+                rawPgHost != null && isRenderInternalPostgresHost(rawPgHost.trim()) && host.contains(".render.com");
+        String sslMode = resolveSslMode(get, host, expandedInternalToFqdn);
         String jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s?sslmode=%s", host, port, db, sslMode);
         return new DatasourceConfig(jdbcUrl, user, pass);
     }
 
     /**
-     * {@code PG_SSLMODE} luôn được tôn trọng nếu set.
-     * <p>
-     * Internal URL trên Render ({@code dpg-…} qua private network): không dùng TLS như external — {@code require}
-     * thường gây EOF lúc auth. External host {@code *.render.com}: cần {@code require}.
+     * Khi DATABASE_URL internal (host cụt {@code dpg-…}) được mở rộng FQDN cho Docker, {@code sslmode=require}
+     * (env hoặc mặc định) thường làm JDBC fail với EOF trong bước auth — dùng {@code prefer}.
+     * URL external từ dashboard (đã FQDN từ đầu): vẫn {@code require} nếu không set env.
      */
-    static String resolveSslMode(Function<String, String> get, String hostHint) {
+    static String resolveSslMode(Function<String, String> get, String hostAfterNormalize, boolean expandedInternalToFqdn) {
+        String h = hostAfterNormalize != null ? hostAfterNormalize.trim() : "";
         String explicit = get.apply("PG_SSLMODE");
         if (explicit != null && !explicit.isBlank()) {
-            return explicit.trim();
+            String e = explicit.trim();
+            if (expandedInternalToFqdn && sslModeStrict(e)) {
+                log.info(
+                        "PG_SSLMODE={} không tương thích ổn định với JDBC khi nối internal DATABASE_URL đã mở rộng FQDN; dùng prefer.",
+                        e);
+                return "prefer";
+            }
+            return e;
         }
-        String h = hostHint != null ? hostHint.trim() : "";
         if (isRenderInternalPostgresHost(h)) {
             return "disable";
         }
         if (h.contains(".render.com")) {
-            return "require";
+            return expandedInternalToFqdn ? "prefer" : "require";
         }
         return "prefer";
+    }
+
+    private static boolean sslModeStrict(String e) {
+        return "require".equalsIgnoreCase(e)
+                || "verify-ca".equalsIgnoreCase(e)
+                || "verify-full".equalsIgnoreCase(e);
+    }
+
+    /** Bỏ {@code sslmode=…} khỏi chuỗi query (có tiền tố {@code ?}). */
+    private static String rebuildQueryWithoutSslMode(String queryWithQuestion) {
+        if (queryWithQuestion == null || queryWithQuestion.length() <= 1) {
+            return "";
+        }
+        String q = queryWithQuestion.substring(1);
+        String stripped = stripSslModeParam(q);
+        return stripped.isEmpty() ? "" : "?" + stripped;
+    }
+
+    private static String stripSslModeParam(String q) {
+        if (q == null || q.isBlank()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String part : q.split("&")) {
+            if (part.isEmpty()) {
+                continue;
+            }
+            if (part.regionMatches(true, 0, "sslmode=", 0, "sslmode=".length())) {
+                continue;
+            }
+            if (sb.length() > 0) {
+                sb.append('&');
+            }
+            sb.append(part);
+        }
+        return sb.toString();
     }
 
     /** Host cụt internal từ DATABASE_URL blueprint Render (private network). */
