@@ -16,8 +16,8 @@ public class SpeakingTopicEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Lob
-  @Column(name = "context_prompt", nullable = false)
+  // TEXT trong Flyway; tránh @Lob (Hibernate 6 + Postgres map String → oid/CLOB, validate fail).
+  @Column(name = "context_prompt", nullable = false, columnDefinition = "TEXT")
   private String contextPrompt;
 
   @Enumerated(EnumType.STRING)
