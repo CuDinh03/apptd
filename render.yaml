@@ -2,8 +2,9 @@
 # PostgreSQL free (cùng workspace) được nối qua DATABASE_URL; backend tự chuyển sang JDBC.
 # Nếu tạo BE tay (không Blueprint): vào Web Service → Environment → Add → From database → chọn Postgres
 # để có DATABASE_URL; hoặc dán Internal Database URL vào biến DATABASE_URL. Thiếu URL → app nối localhost:5432 và lỗi.
-# connectionString đôi khi chỉ có host cụt dpg-…-a — BE cần RENDER_POSTGRES_HOST_SUFFIX = region-postgres.render.com (khớp region DB).
-# Trên service BE: xóa DB_PORT=3306 (MySQL cũ) nếu còn.
+# connectionString đôi khi chỉ có host cụt dpg-…-a — Docker Web Service trên Render không resolve được;
+# bắt buộc RENDER_POSTGRES_HOST_SUFFIX = region-postgres.render.com (khớp region DB).
+# Trên service BE: xóa DB_PORT (MySQL cũ) nếu còn — app dùng POSTGRES_PORT / URL, DB_PORT không đọc.
 #
 # Sau khi backend có URL (vd https://apptd-be.onrender.com), vào service FE sửa:
 #   NEXT_PUBLIC_API_URL = https://apptd-be.onrender.com/api/v1

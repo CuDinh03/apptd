@@ -163,14 +163,6 @@ public final class RenderDatabaseUrlSupport {
         return h.startsWith("dpg-") && !h.contains(".");
     }
 
-    private static boolean isRunningOnRender(Function<String, String> get) {
-        if ("true".equalsIgnoreCase(firstNonBlank(get.apply("RENDER"), ""))) {
-            return true;
-        }
-        String sid = get.apply("RENDER_SERVICE_ID");
-        return sid != null && !sid.isBlank();
-    }
-
     /** Lấy host từ {@code jdbc:postgresql://host:port/db} (đủ cho gợi ý SSL; không cần parse IPv6 đầy đủ). */
     private static String extractJdbcHost(String jdbcUrl) {
         try {
@@ -197,8 +189,9 @@ public final class RenderDatabaseUrlSupport {
     }
 
     /**
-     * Host cụt {@code dpg-…}: trên Render, DNS private network resolve được — giữ nguyên (không ép FQDN external).
-     * Ngoài Render (Docker laptop, CI): cần {@code RENDER_POSTGRES_HOST_SUFFIX} nếu host không resolve.
+     * Blueprint Render thường cho host cụt {@code dpg-…-a}. JVM trong Docker Web Service trên Render
+     * <strong>không</strong> resolve được hostname đó ({@link java.net.UnknownHostException}) — phải gắn FQDN
+     * qua {@code RENDER_POSTGRES_HOST_SUFFIX} (vd. {@code singapore-postgres.render.com}).
      */
     private static String normalizeRenderPostgresHost(String host, Function<String, String> get) {
         if (host == null || host.isBlank()) {
@@ -209,10 +202,6 @@ public final class RenderDatabaseUrlSupport {
             return host;
         }
         if (!host.startsWith("dpg-")) {
-            return host;
-        }
-        if (isRunningOnRender(get)) {
-            log.info("Giữ Postgres internal host (Render private network): {}", host);
             return host;
         }
         String suffix = firstNonBlank(get.apply("RENDER_POSTGRES_HOST_SUFFIX"), get.apply("PG_DNS_SUFFIX"));
