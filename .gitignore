@@ -15,6 +15,7 @@ frontend-nextjs/out/
 frontend-nextjs/.turbo
 frontend-nextjs/npm-debug.log*
 frontend-nextjs/.vercel
+frontend-nextjs/tsconfig.tsbuildinfo
 
 # --- IDE / OS ---
 .idea/
