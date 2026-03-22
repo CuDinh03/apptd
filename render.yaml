@@ -1,0 +1,54 @@
+# Blueprint Render: đẩy repo lên GitHub → Dashboard Render → Blueprint → chọn repo → Apply.
+# Trước khi Apply: tạo MySQL chỗ khác (Render không có MySQL free) — xem ghi chú cuối file.
+#
+# Sau khi backend có URL (vd https://apptd-be.onrender.com), vào service FE sửa:
+#   NEXT_PUBLIC_API_URL = https://apptd-be.onrender.com/api/v1
+# Và trên BE sửa CORS_ALLOWED_ORIGIN_PATTERNS = URL frontend Render.
+
+services:
+  - type: web
+    name: apptd-backend
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: be/Dockerfile
+    dockerContext: be
+    healthCheckPath: /api/v1/lessons
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: ENFORCE_STRONG_JWT_SECRET
+        value: "true"
+      - key: FLYWAY_ENABLED
+        value: "true"
+      - key: JPA_DDL_AUTO
+        value: none
+      # Render Dashboard: điền host/port DB ngoài (PlanetScale, db4free, VPS…)
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_NAME
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ALLOWED_ORIGIN_PATTERNS
+        sync: false
+
+  - type: web
+    name: apptd-frontend
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: frontend-nextjs
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "20.18.0"
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
