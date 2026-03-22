@@ -28,8 +28,7 @@ public class LessonExerciseEntity {
   private String questionText;
 
   /** JSON mảng các lựa chọn cho MCQ, ví dụ: ["Guten Tag","Guten Morgen"] */
-  @Lob
-  @Column(name = "choices_json")
+  @Column(name = "choices_json", columnDefinition = "TEXT")
   private String choicesJson;
 
   /** Đáp án đúng (chuỗi khớp với một lựa chọn MCQ hoặc câu trả lời ngắn). */
