@@ -10,10 +10,11 @@ spring:
     baseline-on-migrate: true
     baseline-version: 2
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${POSTGRES_PORT}/${DB_NAME}?sslmode=prefer
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
+    # Local / Docker MySQL: utf8mb4 (tiếng Đức). .env.local: DB_HOST, MYSQL_PORT, DB_NAME, DB_USERNAME, DB_PASSWORD.
+    url: jdbc:mysql://${DB_HOST:localhost}:${MYSQL_PORT:3306}/${DB_NAME:deutsch_db}?useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
@@ -21,7 +22,7 @@ spring:
       ddl-auto: ${JPA_DDL_AUTO:none}
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
     open-in-view: false
   servlet:

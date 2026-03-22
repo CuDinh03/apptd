@@ -4,8 +4,7 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    # Khi không có DATABASE_URL: host external (*.render.com) cần PG_SSLMODE=require; local/docker thường prefer/disable.
-    url: jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_PORT:5432}/${DB_NAME:deutsch_db}?sslmode=${PG_SSLMODE:prefer}
+    url: jdbc:mysql://${DB_HOST:localhost}:${MYSQL_PORT:3306}/${DB_NAME:deutsch_db}?useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=${MYSQL_USE_SSL:false}
   jpa:
     hibernate:
       ddl-auto: validate

@@ -1,3 +1,6 @@
+# Lưu ý: nhánh local-mysql dùng MySQL (JDBC trong application.yml). Blueprint dưới đây là cấu hình Render cũ (Postgres);
+# deploy BE từ nhánh này cần MySQL managed + env DB_* hoặc merge lại cấu hình Postgres.
+#
 # Blueprint Render: đẩy repo lên GitHub → Dashboard Render → Blueprint → chọn repo → Apply.
 # PostgreSQL free (cùng workspace) được nối qua DATABASE_URL; backend tự chuyển sang JDBC.
 # Nếu tạo BE tay (không Blueprint): vào Web Service → Environment → Add → From database → chọn Postgres

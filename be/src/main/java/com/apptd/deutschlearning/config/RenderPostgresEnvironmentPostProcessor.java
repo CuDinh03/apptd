@@ -24,10 +24,9 @@ public class RenderPostgresEnvironmentPostProcessor implements EnvironmentPostPr
         boolean applied = RenderDatabaseUrlSupport.applyToSpringEnvironment(environment);
 
         if (!applied && isProd(environment)) {
-            log.error(
-                    "Profile prod nhưng chưa map được datasource: thiếu DATABASE_URL, SPRING_DATASOURCE_URL (jdbc:postgresql:…), "
-                            + "hoặc PGHOST+PGDATABASE+PGUSER+PGPASSWORD. Flyway sẽ thử localhost:5432 và fail. "
-                            + "Trên Render: gắn DATABASE_URL (Internal URL) vào Web Service, rồi deploy lại image mới có bootstrap main().");
+            log.info(
+                    "Profile prod: không có DATABASE_URL Postgres — dùng spring.datasource.* từ application.yml "
+                            + "(MySQL: DB_HOST, MYSQL_PORT, DB_NAME, DB_USERNAME, DB_PASSWORD).");
         }
     }
 
