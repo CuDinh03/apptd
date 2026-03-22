@@ -1,0 +1,59 @@
+server:
+  port: 8080
+
+spring:
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    # Chỉ kích hoạt khi schema đã có bảng nhưng chưa có flyway_schema_history (vd. DB cũ từ Hibernate).
+    # DB trống: Flyway vẫn chạy V1→V2 bình thường. baseline-version = migration mới nhất hiện có.
+    baseline-on-migrate: true
+    baseline-version: 2
+  datasource:
+    # utf8mb4: đầy đủ ký tự tiếng Đức (äöüß) và emoji trong nội dung tương lai.
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:deutsch_db}?useSSL=false&serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      # none + Flyway: schema do migration quản lý. Legacy dev: FLYWAY_ENABLED=false và JPA_DDL_AUTO=update (.env.example).
+      ddl-auto: ${JPA_DDL_AUTO:none}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+    open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+ai:
+  enabled: ${AI_ENABLED:false}
+  provider: ${AI_PROVIDER:openai}
+  openai:
+    api-key: ${OPENAI_API_KEY:${AI_API_KEY:}}
+    base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+    chat-model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+    transcription-model: ${OPENAI_TRANSCRIBE_MODEL:whisper-1}
+  claude:
+    api-key: ${CLAUDE_API_KEY:${AI_API_KEY:}}
+    base-url: ${CLAUDE_BASE_URL:https://api.anthropic.com}
+    model: ${CLAUDE_MODEL:claude-3-5-sonnet-20240620}
+
+jwt:
+  secret: ${JWT_SECRET:change_me}
+  expiration-ms: ${JWT_EXPIRATION_MS:2592000000}
+
+logging:
+  level:
+    root: INFO
+    com.apptd: DEBUG
+
+# CORS: danh sách pattern cách nhau bởi dấu phẩy (dev có thể *).
+app:
+  cors:
+    allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:*}
+  security:
+    enforce-strong-jwt-secret: ${ENFORCE_STRONG_JWT_SECRET:false}
+

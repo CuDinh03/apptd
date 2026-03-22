@@ -1,0 +1,16 @@
+# Profile prod: JWT secret bắt buộc mạnh; schema chỉ qua Flyway + Hibernate validate.
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
+app:
+  security:
+    enforce-strong-jwt-secret: true
+  cors:
+    allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:https://your-frontend.example}

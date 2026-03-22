@@ -1,0 +1,24 @@
+# --- Secrets & môi trường local (không đẩy lên GitHub) ---
+.env
+.env.*
+!.env.example
+be/.env.local
+frontend-nextjs/.env.local
+
+# --- Backend Java / Maven ---
+be/target/
+
+# --- Frontend Next.js ---
+frontend-nextjs/node_modules/
+frontend-nextjs/.next/
+frontend-nextjs/out/
+frontend-nextjs/.turbo
+frontend-nextjs/npm-debug.log*
+frontend-nextjs/.vercel
+
+# --- IDE / OS ---
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db

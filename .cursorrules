@@ -1,0 +1,45 @@
+# German Learning Fullstack Project - Cursor Rules
+
+## 1. Global Project Context
+- **Project Goal:** German Learning Website (Levels A1-B2).
+- **Language Support:** All UI and Data must support German characters (ä, ö, ü, ß).
+- **Architecture:** Monorepo: backend Spring Boot trong thư mục **`be/`**, frontend Next.js trong **`frontend-nextjs/`** (tên gợi ý cũ `backend-springboot` tương đương `be`).
+- **Communication:** Frontend calls Backend via REST APIs at `http://localhost:8080/api/v1`.
+
+## 2. Backend Standards (Java Spring Boot)
+- **Stack:** Java 17, Spring Boot 3.2, Spring Security (JWT), MySQL, JPA/Hibernate, Flyway.
+- **Schema:** MySQL dùng JDBC `utf8mb4` (xem `application.yml`); schema chính qua **Flyway** (`db/migration`), Hibernate `ddl-auto` mặc định **`none`**. Profile **`test`**: H2, Flyway tắt, `create-drop`. Profile **`prod`**: Flyway bật, `ddl-auto: validate`, JWT secret siết chặt.
+- **Pattern:** Controller -> Service -> Repository -> Entity -> DTO (Java Records; `ApiResponse<T>` có thể là Lombok class).
+- **Security:** - RBAC: `ROLE_USER`, `ROLE_ADMIN`.
+    - Use `@PreAuthorize("hasRole('ADMIN')")` for sensitive endpoints.
+    - Password encoding: BCrypt.
+    - 401/403 trả JSON `ApiResponse` (filter entry point + access denied handler); `@PreAuthorize` dùng thêm `@ExceptionHandler(AccessDeniedException)` ở `GlobalExceptionHandler`.
+- **Rules:** - Use Lombok for boilerplate.
+    - Global Exception Handling with `@ControllerAdvice` (kể cả lỗi không dự kiến, không lộ stack cho client).
+    - Always wrap responses in `ApiResponse<T>`.
+
+## 3. Frontend Standards (Next.js & Tailwind)
+- **Stack:** Next.js 14+ (App Router), TypeScript, Tailwind CSS, Lucide React (icons), `canvas-confetti` cho phản hồi XP.
+- **State Management:** TanStack Query: fetch/cache qua `useQuery` / `useMutation`; khóa query dùng `src/lib/query-keys.ts` (không đưa JWT vào `queryKey`, dùng `userId` khi cần).
+- **Components:** Functional components; **Shadcn/UI là tùy chọn** — repo hiện dùng Tailwind thuần, không bắt buộc cài Shadcn.
+- **Rules:**
+    - Use `use client` and `use server` directives correctly.
+    - Environment variables for API URL: `process.env.NEXT_PUBLIC_API_URL`.
+    - Responsive Design: Mobile-first approach.
+    - German Article Colors: Masculine (Blue), Feminine (Red), Neuter (Green).
+
+## 4. Integration & Logic
+- **Authentication:** JWT lưu `sessionStorage` sau đăng nhập (phiên theo tab; đóng tab/trình duyệt hoặc đăng xuất thì hết). Có thể dùng HTTP-only cookie cho bản production bảo mật hơn.
+- **AI Speaking Feature:** - Frontend sends audio/blob to Backend.
+    - Backend proxies to Claude/OpenAI API and returns structured feedback.
+- **Scoring System:** Backend calculates XP; Frontend gọi `celebrateXp` (confetti) khi `xpAwarded > 0` sau submit bài.
+
+## 5. macOS Development Workflow
+- **Terminal:** Use `zsh`. 
+- **Package Managers:** `mvn` / `./mvnw` cho Backend (`be/`), `npm` hoặc `pnpm` cho Frontend (`frontend-nextjs/`).
+- **Environment:** Backend: `be/.env.local` (mẫu `be/.env.example`); Frontend: `.env.local` với `NEXT_PUBLIC_API_URL`. Không hardcode API keys.
+
+## 6. Communication Style
+- Comments in code: Tiếng Việt.
+- Variable names: English.
+- AI should suggest improvements for UX and German grammar whenever creating new features.
