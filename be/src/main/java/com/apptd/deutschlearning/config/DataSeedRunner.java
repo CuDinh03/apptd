@@ -12,7 +12,6 @@ import com.apptd.deutschlearning.repository.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,12 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Seed dữ liệu mẫu (P0) — chỉ chạy khi không phải profile prod.
+ * Seed dữ liệu mẫu (P0) — chạy mọi profile (kể cả prod), idempotent.
  * Hỗ trợ ký tự tiếng Đức: ä, ö, ü, ß.
  */
 @Component
 @Order(Integer.MAX_VALUE)
-@Profile("!prod")
 public class DataSeedRunner implements ApplicationRunner {
 
   private final UserRepository userRepository;
@@ -63,18 +61,12 @@ public class DataSeedRunner implements ApplicationRunner {
   }
 
   /**
-   * Hai tài khoản demo: {@code admin} (quản trị) và {@code student} (học viên).
-   * Chỉ tạo nếu chưa tồn tại — mật khẩu khớp gợi ý trên trang đăng nhập FE.
+   * {@code admin} / Admin12345 (ROLE_ADMIN) và {@code student} / Student123 (USER).
+   * Admin: tạo nếu thiếu; nếu đã có thì đảm bảo role ADMIN và mật khẩu đúng theo yêu cầu triển khai.
+   * Student: chỉ tạo nếu chưa tồn tại.
    */
   private void seedUsersIfNeeded() {
-    if (!userRepository.existsByUsername("admin")) {
-      userRepository.save(UserEntity.builder()
-          .username("admin")
-          .passwordHash(passwordEncoder.encode("Admin12345"))
-          .role(Role.ADMIN)
-          .totalXp(0)
-          .build());
-    }
+    upsertAdminUser();
     if (!userRepository.existsByUsername("student")) {
       userRepository.save(UserEntity.builder()
           .username("student")
@@ -82,6 +74,32 @@ public class DataSeedRunner implements ApplicationRunner {
           .role(Role.USER)
           .totalXp(0)
           .build());
+    }
+  }
+
+  private void upsertAdminUser() {
+    var existing = userRepository.findByUsername("admin");
+    if (existing.isEmpty()) {
+      userRepository.save(UserEntity.builder()
+          .username("admin")
+          .passwordHash(passwordEncoder.encode("Admin12345"))
+          .role(Role.ADMIN)
+          .totalXp(0)
+          .build());
+      return;
+    }
+    UserEntity admin = existing.get();
+    boolean dirty = false;
+    if (admin.getRole() != Role.ADMIN) {
+      admin.setRole(Role.ADMIN);
+      dirty = true;
+    }
+    if (!passwordEncoder.matches("Admin12345", admin.getPasswordHash())) {
+      admin.setPasswordHash(passwordEncoder.encode("Admin12345"));
+      dirty = true;
+    }
+    if (dirty) {
+      userRepository.save(admin);
     }
   }
 
