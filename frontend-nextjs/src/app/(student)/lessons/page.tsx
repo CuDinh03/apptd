@@ -6,6 +6,7 @@ import { fetchLessons, LessonDto } from "@/lib/api";
 import { queryKeys } from "@/lib/query-keys";
 import Link from "next/link";
 
+import StudentPageHint from "@/components/StudentPageHint";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const LEVELS = ["A1", "A2", "B1", "B2"] as const;
@@ -50,6 +51,8 @@ export default function LessonsPage() {
           </select>
         </div>
       </div>
+
+      <StudentPageHint>{t("lessons.pageHint")}</StudentPageHint>
 
       {query.isLoading && <div className="text-sm text-gray-700">{t("lessons.loading")}</div>}
       {query.isError && (

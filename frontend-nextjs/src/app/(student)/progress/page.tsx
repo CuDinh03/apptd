@@ -6,6 +6,7 @@ import { fetchLeaderboard, fetchMyProgress } from "@/lib/api";
 import { queryKeys } from "@/lib/query-keys";
 
 import { useAuth } from "@/contexts/AuthContext";
+import StudentPageHint from "@/components/StudentPageHint";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 function statusLabel(t: (k: string) => string, status: string) {
@@ -35,7 +36,9 @@ export default function ProgressPage() {
     <div className="space-y-4">
       <div className="rounded-md border border-gray-200 bg-white p-4">
         <h1 className="text-lg font-semibold">{t("progress.titlePage")}</h1>
-        <p className="mt-2 text-sm text-gray-600">{t("progress.howXpWorks")}</p>
+        <div className="mt-2">
+          <StudentPageHint>{t("progress.pageHint")}</StudentPageHint>
+        </div>
 
         {!ready && <div className="mt-3 text-sm text-gray-600">{t("progress.loadingMyProgress")}</div>}
 
@@ -115,6 +118,7 @@ export default function ProgressPage() {
 
       <div className="rounded-md border border-gray-200 bg-white p-4">
         <h2 className="text-base font-semibold">{t("progress.leaderboard")}</h2>
+        <p className="mt-1 text-xs text-gray-600">{t("progress.leaderboardHint")}</p>
         {leaderboardQuery.isLoading && (
           <div className="mt-2 text-sm text-gray-700">{t("progress.leaderboardLoading")}</div>
         )}

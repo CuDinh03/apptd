@@ -1,6 +1,8 @@
 # Blueprint Render: đẩy repo lên GitHub → Dashboard Render → Blueprint → chọn repo → Apply.
 # PostgreSQL free (cùng workspace) được nối qua DATABASE_URL; backend tự chuyển sang JDBC.
-# Trên service BE: xóa DB_PORT=3306 (MySQL cũ) nếu còn — JDBC Postgres dùng POSTGRES_PORT (mặc định 5432) hoặc chỉ DATABASE_URL.
+# Nếu tạo BE tay (không Blueprint): vào Web Service → Environment → Add → From database → chọn Postgres
+# để có DATABASE_URL; hoặc dán Internal Database URL vào biến DATABASE_URL. Thiếu URL → app nối localhost:5432 và lỗi.
+# Trên service BE: xóa DB_PORT=3306 (MySQL cũ) nếu còn.
 #
 # Sau khi backend có URL (vd https://apptd-be.onrender.com), vào service FE sửa:
 #   NEXT_PUBLIC_API_URL = https://apptd-be.onrender.com/api/v1

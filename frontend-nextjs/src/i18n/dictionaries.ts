@@ -20,14 +20,12 @@ const en = {
   },
   home: {
     title: "Welcome!",
-    intro:
-      "This is a sample frontend for the API at /api/v1: lessons, progress submission, and AI speech analysis.",
-    noteTitle: "Note",
-    noteBody:
-      "Sign in to save lesson progress (XP is added when you complete exercises) and to use AI speech analysis. Your session stays in this browser tab until you log out or close the tab/browser."
+    hint:
+      "Top menu: Lessons — choose a level, open a card, View content. Progress — your XP and lesson list. AI Speaking — upload audio or paste text (sign in first). Session is per browser tab."
   },
   lessons: {
     title: "Lessons",
+    pageHint: "Pick a level, then open a lesson with View content. XP is counted when you submit from the lesson page.",
     level: "Level:",
     loading: "Loading…",
     error: "Could not load lessons.",
@@ -60,17 +58,20 @@ const en = {
     vocabUsage: "Usage:",
     usageHowTo: "How to use (notes)",
     sampleSentences: "Sample sentences (using lesson vocabulary)",
-    examplesSectionIntro: "Before exercises — study these patterns and sentences that use this lesson’s words.",
+    pageHint:
+      "Flow: skim vocabulary and examples → answer every exercise → Submit lesson (you must be signed in for XP). Use Check on each item or submit to validate all.",
+    examplesSectionIntro: "Patterns and sample sentences using this lesson’s words.",
     examplesSectionEmpty:
-      "No examples returned from the server. Restart the backend (non-prod) or update the app so lesson JSON syncs.",
+      "No examples from the server. If you run your own backend, check lesson data or non-prod seed.",
     listenGerman: "Listen (German pronunciation)",
     listenUnsupported:
       "No audio file and this browser does not support read-aloud. Try Chrome or Edge, or use a lesson with audio URLs."
   },
   progress: {
     titlePage: "Your progress",
-    howXpWorks:
-      "XP is added automatically when you complete a lesson’s exercises and submit from the lesson page. You don’t enter scores manually here — progress reflects lessons you have studied.",
+    pageHint:
+      "XP updates when you submit a lesson after doing the exercises. This page is read-only: see totals, per-lesson XP, and status.",
+    leaderboardHint: "Ranking by total XP (all learners).",
     studiedLessons: "Lessons you have studied",
     noLessonsYet: "No lessons yet. Open a lesson and finish the exercises to earn XP.",
     colOrder: "#",
@@ -96,6 +97,8 @@ const en = {
   },
   ai: {
     title: "Pronunciation analysis (AI speaking)",
+    pageHint:
+      "Sign in. Add an audio file and/or text, pick level (or topic ID if you have one), then Analyze. At least one of audio or text is required.",
     audioOptional: "Audio (optional)",
     levelOptional: "Level requirement (optional)",
     textOptional: "Text (optional)",
@@ -116,8 +119,11 @@ const en = {
   auth: {
     loginTitle: "Log in",
     registerTitle: "Register",
+    loginPageHint:
+      "Enter your username and password, then Log in. After login you can save lesson XP and use AI speaking.",
     seedHint:
-      "Demo accounts (seeded by BE when not prod): learner student / Student123 · admin / Admin12345",
+      "Demo (when backend seeds non-prod): student / Student123 · admin / Admin12345",
+    registerPageHint: "Choose a username and password that meet the rules below, then register — you will be signed in automatically.",
     username: "Username",
     password: "Password",
     loginFailed: "Login failed",
@@ -130,9 +136,8 @@ const en = {
     title: "Session",
     loggedIn: "Signed in as",
     role: "Role",
-    hintCloseBrowser:
-      "This session is stored for this tab only. Closing the tab or the browser (Chrome, Safari, …) ends the session unless you log in again.",
-    notLoggedIn: "Sign in to save lesson XP and use AI speaking. Your token is saved automatically after login.",
+    hintCloseBrowser: "Session is for this tab only — close tab/browser and you’ll need to sign in again.",
+    notLoggedIn: "Sign in to save XP and use AI speaking.",
     signInCta: "Sign in",
     adminPanelCta: "Admin: curriculum →"
   },
@@ -216,14 +221,13 @@ const de = {
   },
   home: {
     title: "Willkommen!",
-    intro:
-      "Dieses Frontend ruft die API unter /api/v1 auf: Lektionen, Fortschritt und KI-Sprachanalyse.",
-    noteTitle: "Hinweis",
-    noteBody:
-      "Melden Sie sich an, um Lektionsfortschritt zu speichern (XP durch gelöste Übungen) und KI-Sprachanalyse zu nutzen. Die Sitzung bleibt in diesem Tab, bis Sie sich abmelden oder den Tab/Browser schließen."
+    hint:
+      "Menü oben: Lektionen — Niveau wählen, Karte öffnen, Inhalt ansehen. Fortschritt — XP und Liste. KI Sprechen — Audio oder Text (zuerst anmelden). Sitzung gilt nur für diesen Tab."
   },
   lessons: {
     title: "Lektionen",
+    pageHint:
+      "Niveau wählen, dann „Inhalt ansehen“. XP gibt es, wenn du auf der Lektionsseite abgibst.",
     level: "Niveau:",
     loading: "Laden…",
     error: "Lektionen konnten nicht geladen werden.",
@@ -256,17 +260,20 @@ const de = {
     vocabUsage: "Verwendung:",
     usageHowTo: "Verwendung (Hinweise)",
     sampleSentences: "Beispielsätze (Wortschatz der Lektion)",
-    examplesSectionIntro: "Vor den Übungen — Muster und Sätze mit dem Wortschatz dieser Lektion.",
+    pageHint:
+      "Ablauf: Wortschatz und Beispiele lesen → alle Übungen beantworten → Lektion abgeben (für XP anmelden). Pro Übung „Prüfen“ oder beim Abgeben alles prüfen.",
+    examplesSectionIntro: "Muster und Beispielsätze mit dem Wortschatz dieser Lektion.",
     examplesSectionEmpty:
-      "Keine Beispiele vom Server. Backend neu starten (nicht prod) oder App aktualisieren, damit die Lektion synchronisiert.",
+      "Keine Beispiele vom Server. Eigenes Backend prüfen oder Lektionsdaten/Seed (nicht prod).",
     listenGerman: "Anhören (deutsche Aussprache)",
     listenUnsupported:
       "Keine Audiodatei und keine Vorlesefunktion im Browser. Chrome/Edge probieren oder Lektion mit Audio-URLs nutzen."
   },
   progress: {
     titlePage: "Dein Fortschritt",
-    howXpWorks:
-      "XP wird automatisch gutgeschrieben, wenn du die Übungen einer Lektion abschließt und auf der Lektionsseite abgibst. Hier trägst du keine Punktzahl manuell ein — der Fortschritt basiert auf den Lektionen, die du bearbeitet hast.",
+    pageHint:
+      "XP kommt, wenn du nach den Übungen auf der Lektionsseite abgibst. Diese Seite zeigt nur Übersicht und Status.",
+    leaderboardHint: "Rangliste nach Gesamt-XP.",
     studiedLessons: "Bearbeitete Lektionen",
     noLessonsYet: "Noch keine Lektion. Öffne eine Lektion und löse die Übungen, um XP zu sammeln.",
     colOrder: "#",
@@ -292,6 +299,8 @@ const de = {
   },
   ai: {
     title: "Ausspracheanalyse (KI-Sprechen)",
+    pageHint:
+      "Anmelden. Audio und/oder Text hinzufügen, Niveau (oder Themen-ID) wählen, dann Analysieren. Mindestens Audio oder Text nötig.",
     audioOptional: "Audio (optional)",
     levelOptional: "Niveau (optional)",
     textOptional: "Text (optional)",
@@ -312,8 +321,12 @@ const de = {
   auth: {
     loginTitle: "Anmelden",
     registerTitle: "Registrieren",
+    loginPageHint:
+      "Benutzername und Passwort eingeben, dann anmelden. Danach XP speichern und KI-Sprechen nutzen.",
     seedHint:
-      "Demo-Konten (BE-Seed, nicht prod): Lernende/r student / Student123 · Admin admin / Admin12345",
+      "Demo (BE-Seed, nicht prod): student / Student123 · admin / Admin12345",
+    registerPageHint:
+      "Benutzername und Passwort nach den Regeln wählen — nach der Registrierung bist du automatisch angemeldet.",
     username: "Benutzername",
     password: "Passwort",
     loginFailed: "Anmeldung fehlgeschlagen",
@@ -326,9 +339,8 @@ const de = {
     title: "Sitzung",
     loggedIn: "Angemeldet als",
     role: "Rolle",
-    hintCloseBrowser:
-      "Die Sitzung gilt nur für diesen Tab. Schließen Sie den Tab oder den Browser (Chrome, Safari, …), ist die Sitzung beendet.",
-    notLoggedIn: "Melden Sie sich an, um Lektions-XP zu speichern und KI-Sprechen zu nutzen. Das Token wird nach dem Login gespeichert.",
+    hintCloseBrowser: "Nur dieser Tab — Tab/Browser schließen, dann neu anmelden.",
+    notLoggedIn: "Anmelden für XP und KI-Sprechen.",
     signInCta: "Anmelden",
     adminPanelCta: "Admin: Lehrplan →"
   },
@@ -412,14 +424,12 @@ const vi = {
   },
   home: {
     title: "Chào mừng!",
-    intro:
-      "Đây là FE mẫu gọi BE tại /api/v1: bài học, gửi tiến độ và phân tích giọng nói bằng AI.",
-    noteTitle: "Lưu ý",
-    noteBody:
-      "Đăng nhập để lưu tiến độ bài học (XP cộng khi làm xong bài tập) và dùng phân tích giọng nói AI. Phiên được giữ trong tab trình duyệt cho đến khi đăng xuất hoặc đóng tab/trình duyệt."
+    hint:
+      "Menu trên: Bài học — chọn cấp độ → mở thẻ bài → Xem nội dung. Tiến độ: XP và danh sách bài. AI nói: tải audio hoặc dán chữ (đăng nhập trước). Phiên theo từng tab trình duyệt."
   },
   lessons: {
     title: "Bài học",
+    pageHint: "Chọn cấp độ, bấm Xem nội dung vào bài. XP chỉ tính khi bạn nộp bài trên trang bài học.",
     level: "Trình độ:",
     loading: "Đang tải…",
     error: "Không tải được bài học.",
@@ -452,17 +462,20 @@ const vi = {
     vocabUsage: "Cách dùng:",
     usageHowTo: "Cách dùng từ / cấu trúc",
     sampleSentences: "Câu mẫu (dùng từ vựng bài học)",
-    examplesSectionIntro: "Trước khi làm bài tập — đọc gợi ý cách dùng và các câu mẫu có từ vựng của bài.",
+    pageHint:
+      "Thứ tự: xem từ vựng & câu mẫu → trả lời hết bài tập → Nộp bài (cần đăng nhập để cộng XP). Có thể bấm Kiểm tra từng câu hoặc nộp để hệ thống chấm hết.",
+    examplesSectionIntro: "Gợi ý cách dùng và câu mẫu có từ vựng của bài.",
     examplesSectionEmpty:
-      "Chưa có câu mẫu từ máy chủ. Hãy khởi động lại backend (không dùng profile prod) hoặc cập nhật bản app để đồng bộ dữ liệu bài học.",
+      "Chưa có câu mẫu từ server. Kiểm tra backend hoặc dữ liệu bài / seed (môi trường không prod).",
     listenGerman: "Nghe phát âm (tiếng Đức)",
     listenUnsupported:
       "Chưa có file âm thanh và trình duyệt không hỗ trợ đọc tiếng Đức. Thử Chrome/Edge hoặc bài có URL audio."
   },
   progress: {
     titlePage: "Tiến độ của bạn",
-    howXpWorks:
-      "Điểm XP được cộng tự động khi bạn làm xong bài tập trong một bài học và bấm nộp bài trên trang bài học. Trang này không nhập điểm tay — tiến độ dựa trên các bài bạn đã học.",
+    pageHint:
+      "XP cập nhật khi bạn nộp bài sau khi làm bài tập. Trang này chỉ xem: tổng XP, XP từng bài, trạng thái.",
+    leaderboardHint: "Xếp hạng theo tổng XP (mọi học viên).",
     studiedLessons: "Các bài đã học",
     noLessonsYet: "Chưa có bài nào. Vào danh sách bài học, làm hết bài tập để tích XP.",
     colOrder: "#",
@@ -488,6 +501,8 @@ const vi = {
   },
   ai: {
     title: "Phân tích phát âm (AI nói)",
+    pageHint:
+      "Đăng nhập. Thêm file âm thanh và/hoặc văn bản, chọn cấp độ (hoặc SpeakingTopicId nếu có), rồi Phân tích. Bắt buộc có ít nhất audio hoặc text.",
     audioOptional: "File âm thanh (tùy chọn)",
     levelOptional: "Trình độ (tùy chọn)",
     textOptional: "Văn bản (tùy chọn)",
@@ -508,8 +523,12 @@ const vi = {
   auth: {
     loginTitle: "Đăng nhập",
     registerTitle: "Đăng ký",
+    loginPageHint:
+      "Nhập tên đăng nhập và mật khẩu, bấm Đăng nhập. Sau đó mới lưu XP bài học và dùng AI nói.",
     seedHint:
-      "Tài khoản mẫu (BE seed khi không prod): học viên student / Student123 · quản trị admin / Admin12345",
+      "Demo (BE seed khi không prod): student / Student123 · admin / Admin12345",
+    registerPageHint:
+      "Chọn username và mật khẩu đúng quy tắc bên dưới — sau đăng ký bạn được đăng nhập luôn.",
     username: "Tên đăng nhập",
     password: "Mật khẩu",
     loginFailed: "Đăng nhập thất bại",
@@ -522,9 +541,8 @@ const vi = {
     title: "Phiên làm việc",
     loggedIn: "Đã đăng nhập",
     role: "Vai trò",
-    hintCloseBrowser:
-      "Phiên chỉ lưu trong tab này. Đóng tab hoặc tắt trình duyệt (Chrome, Safari, …) sẽ kết thúc phiên; đăng nhập lại nếu cần.",
-    notLoggedIn: "Đăng nhập để lưu XP bài học và dùng AI nói. Token được lưu tự động sau khi đăng nhập.",
+    hintCloseBrowser: "Phiên theo tab này — đóng tab/trình duyệt là hết, cần đăng nhập lại.",
+    notLoggedIn: "Đăng nhập để lưu XP và dùng AI nói.",
     signInCta: "Đăng nhập",
     adminPanelCta: "Khu quản trị lộ trình →"
   },

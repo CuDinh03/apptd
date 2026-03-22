@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { analyzeSpeech, SpeechAnalysisResponse } from "@/lib/api";
 
 import { useAuth } from "@/contexts/AuthContext";
+import StudentPageHint from "@/components/StudentPageHint";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const LEVELS = ["A1", "A2", "B1", "B2"] as const;
@@ -43,6 +44,9 @@ export default function AiSpeechPage() {
     <div className="space-y-4">
       <div className="rounded-md border border-gray-200 bg-white p-4">
         <h1 className="text-lg font-semibold">{t("ai.title")}</h1>
+        <div className="mt-2">
+          <StudentPageHint>{t("ai.pageHint")}</StudentPageHint>
+        </div>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <label className="space-y-1 text-sm">
             <div className="font-medium">{t("ai.audioOptional")}</div>

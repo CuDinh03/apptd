@@ -20,6 +20,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import VocabularyHoverWord from "@/components/VocabularyHoverWord";
 import LessonUsageSection from "@/components/LessonUsageSection";
 import GermanListenButton from "@/components/GermanListenButton";
+import StudentPageHint from "@/components/StudentPageHint";
 
 function articleColor(article?: string) {
   const a = (article ?? "").toLowerCase();
@@ -201,6 +202,8 @@ export default function LessonContentPage() {
             </div>
             <div className="mt-1 text-lg font-semibold">{data.lesson.title}</div>
           </div>
+
+          <StudentPageHint>{t("lessonContent.pageHint")}</StudentPageHint>
 
           <div className="rounded-md border border-gray-200 bg-white p-4">
             <h2 className="text-base font-semibold">{t("lessonContent.vocab")}</h2>

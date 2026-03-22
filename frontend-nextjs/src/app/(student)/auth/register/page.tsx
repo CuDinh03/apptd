@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRegisterMutation } from "@/hooks/useAuthMutations";
+import StudentPageHint from "@/components/StudentPageHint";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function RegisterPage() {
@@ -35,7 +36,10 @@ export default function RegisterPage() {
         <UserPlus className="h-6 w-6" aria-hidden />
         {t("auth.registerTitle")}
       </div>
-      <p className="text-sm text-gray-600">{t("auth.registerRules")}</p>
+      <StudentPageHint>
+        <span className="block">{t("auth.registerPageHint")}</span>
+        <span className="mt-1 block text-xs opacity-90">{t("auth.registerRules")}</span>
+      </StudentPageHint>
       <form onSubmit={onSubmit} className="space-y-3 rounded-md border border-gray-200 bg-white p-4">
         <label className="block text-sm font-medium">
           {t("auth.username")}
