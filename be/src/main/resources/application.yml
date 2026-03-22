@@ -10,18 +10,18 @@ spring:
     baseline-on-migrate: true
     baseline-version: 2
   datasource:
-    # utf8mb4: đầy đủ ký tự tiếng Đức (äöüß) và emoji trong nội dung tương lai.
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:deutsch_db}?useSSL=false&serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci
-    username: ${DB_USERNAME:root}
+    # PostgreSQL UTF8: đầy đủ ký tự tiếng Đức (äöüß). Render: PG_SSLMODE=require (xem render.yaml).
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:deutsch_db}?sslmode=${PG_SSLMODE:prefer}
+    username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       # none + Flyway: schema do migration quản lý. Legacy dev: FLYWAY_ENABLED=false và JPA_DDL_AUTO=update (.env.example).
       ddl-auto: ${JPA_DDL_AUTO:none}
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     open-in-view: false
   servlet:
