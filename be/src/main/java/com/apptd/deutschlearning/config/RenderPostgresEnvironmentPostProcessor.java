@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
@@ -16,12 +18,17 @@ import org.springframework.core.env.MapPropertySource;
  */
 public class RenderPostgresEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
+    private static final Logger log = LoggerFactory.getLogger(RenderPostgresEnvironmentPostProcessor.class);
+
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         String raw = firstNonBlank(
                 environment.getProperty("DATABASE_URL"),
                 environment.getProperty("RENDER_DATABASE_URL"));
         if (raw == null || !raw.startsWith("postgres")) {
+            if (raw == null) {
+                log.debug("Không có DATABASE_URL — dùng jdbc từ application.yml (DB_HOST / POSTGRES_PORT / …).");
+            }
             return;
         }
         try {
@@ -56,8 +63,11 @@ public class RenderPostgresEnvironmentPostProcessor implements EnvironmentPostPr
             map.put("spring.datasource.password", password);
             map.put("spring.datasource.driver-class-name", "org.postgresql.Driver");
             environment.getPropertySources().addFirst(new MapPropertySource("renderPostgresJdbc", map));
-        } catch (Exception ignored) {
-            // Giữ cấu hình từ application.yml / biến DB_*.
+            log.info("Đã map DATABASE_URL → JDBC (host={}, port={}, db={}).", host, port, dbName);
+        } catch (Exception e) {
+            log.warn(
+                    "Không parse được DATABASE_URL — dùng application.yml. Lỗi: {}",
+                    e.getMessage());
         }
     }
 

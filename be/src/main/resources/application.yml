@@ -10,8 +10,8 @@ spring:
     baseline-on-migrate: true
     baseline-version: 2
   datasource:
-    # PostgreSQL UTF8: đầy đủ ký tự tiếng Đức (äöüß). Render: PG_SSLMODE=require (xem render.yaml).
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:deutsch_db}?sslmode=${PG_SSLMODE:prefer}
+    # Cổng dùng POSTGRES_PORT (mặc định 5432). Tránh DB_PORT=3306 sót từ blueprint MySQL trên Render.
+    url: jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_PORT:5432}/${DB_NAME:deutsch_db}?sslmode=${PG_SSLMODE:prefer}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
